@@ -27,132 +27,111 @@ def hello_world():
     r = ''
     redis_time = []
     time_query = []
-    for i in range(30):
-        time_query.append(i + 1)
-    query_time = []
-    query = "SELECT TOP 1000 * FROM [dbo].[earthquake]"
-    cursor.execute(query)
-    temp = cursor.fetchall()
-    temp_result = ""
-    for j in temp:
-        temp_result = temp_result + str(j)
-    red.set(1, temp_result)
-    s = time.time()
-    for i in time_query:
-        start = time.time()
-        cursor.execute(query)
-        end = time.time()
-        diff = end - start
-        query_time.append(diff)
+    query=""
+    temp=[]
+    tot_db = 0
+    tot_red = 0
+    if request.method=="POST":
+        srange=request.form['srange']
+        erange=request.form['erange']
+        for i in range(30):
+            time_query.append(i + 1)
+        query_time = []
+        query = "SELECT * FROM [dbo].[city1] where Population between ? and ?"
+        cursor.execute(query,srange,erange)
+        temp = cursor.fetchall()
+        temp_result = ""
+        for j in temp:
+            temp_result = temp_result + str(j)
+        red.set(1, temp_result)
         s = time.time()
-        red.get(1)
-        e = time.time()
-        redis_time.append(e - s)
-    print(query_time)
-    return render_template("index.html", result=query_time, r=time_query, redis_time=redis_time)
+        for i in time_query:
+            start = time.time()
+            cursor.execute(query, srange, erange)
+            end = time.time()
+            diff = end - start
+            query_time.append(diff)
+            tot_db=tot_db+diff
+            s = time.time()
+            red.get(1)
+            e = time.time()
+            redis_time.append(e - s)
+            tot_red=tot_red+(e-s)
+    return render_template("index.html", result=query_time, r=time_query, redis_time=redis_time,query=temp,tot_db=tot_db,tot_red=tot_red)
 
 
 @app.route('/page2.html', methods=['GET', 'POST'])
 def page2():
     query_time = []
     time_query = []
-    result = []
+    r = ''
     redis_time = []
+    time_query = []
+    query = ""
+    tot_db=0
+    tot_red=0
+    temp=[]
     if request.method == "POST":
-        minlat = request.form['lat']
-        minlon = request.form['lon']
-        maxlat = request.form['mlat']
-        maxlon = request.form['mlon']
-        query = "select top(1000) * from dbo.earthquake where latitude between ? and ? and longitude between ? and ?"
-        cursor.execute(query, minlat, maxlat, minlon, maxlon)
+        srange = request.form['srange']
+        erange = request.form['erange']
+        no=int(request.form['number'])
+        for i in range(30):
+            time_query.append(i + 1)
+        query_time = []
+        query = "SELECT TOP (?) * FROM [dbo].[city1] TABLESAMPLE(500 rows) where Population between ? and ?"
+        cursor.execute(query,no,srange, erange)
         temp = cursor.fetchall()
         temp_result = ""
         for j in temp:
             temp_result = temp_result + str(j)
-        red.set(2, temp_result)
-        time_query = []
-        redis_time = []
-        time_query = []
-        for i in range(30):
-            time_query.append(i + 1)
-        query_time = []
+        red.set(1, temp_result)
+        tot_db=0
+        tot_red=0
         for i in time_query:
             start = time.time()
-            cursor.execute(query, minlat, maxlat, minlon, maxlon)
+            cursor.execute(query, no, srange, erange)
             end = time.time()
+            temp=cursor.fetchall()
             diff = end - start
             query_time.append(diff)
+            tot_db=tot_db+diff
             s = time.time()
-            temp = red.get(2)
+            red.get(1)
             e = time.time()
             redis_time.append(e - s)
-    return render_template("page2.html", result=query_time, r=time_query, redis_time=redis_time)
+            tot_red=tot_red+(e-s)
+        print(temp)
+    return render_template("page2.html", result=query_time, r=time_query, redis_time=redis_time, query=temp,tot_db=tot_db,tot_red=tot_red)
 
 
-@app.route('/page22.html', methods=['GET', 'POST'])
-def page22():
+@app.route('/page3.html', methods=['GET', 'POST'])
+def page3():
     query_time = []
     time_query = []
     result = []
     redis_time = []
+    tot=0
+    cities=''
+    cities2=''
     if request.method == "POST":
-        smag = request.form['smag']
-        emag = request.form['emag']
-        query = "select top(1000) * from dbo.earthquake where mag between ? and ? ;"
-        cursor.execute(query, smag, emag)
-        temp = cursor.fetchall()
-        temp_result = ""
-        for j in temp:
-            temp_result = temp_result + str(j)
-        red.set(3, temp_result)
-        for i in range(30):
-            time_query.append(i + 1)
-        query_time = []
-        for i in time_query:
-            start = time.time()
-            cursor.execute(query, smag, emag)
-            end = time.time()
-            diff = end - start
-            query_time.append(diff)
-            s = time.time()
-            red.get(3)
-            e = time.time()
-            redis_time.append(e - s)
-    return render_template("page2.html", result=query_time, r=time_query, redis_time=redis_time)
+        min=request.form['srange']
+        max=request.form['erange']
+        cname=request.form['cname']
+        inc=request.form['pop']
+        s=time.time()
+        query="select * from dbo.city1 where population>? and population<? and state=?"
+        cursor.execute(query,min,max,cname)
+        cities=cursor.fetchall()
+        query = "update city1 set population=population+? where City in (select City from dbo.city1 where population>? and population<? and state=?)"
+        cursor.execute(query, inc, min, max, cname)
+        cursor.commit()
+        query = "select * from dbo.city1 where state=?"
+        cursor.execute(query, cname)
+        cities2 = cursor.fetchall()
+        e=time.time()
+        tot=e-s
+    return render_template("page3.html", tot=tot,cities=cities,cities2=cities2)
 
-
-@app.route('/page23.html', methods=['GET', 'POST'])
-def page23():
-    query_time = []
-    time_query = []
-    result = []
-    redis_time = []
-    if request.method == "POST":
-        lat = request.form['lat1']
-        long = request.form['lon1']
-        ran = request.form['range']
-        query = "select top(1000) * from dbo.earthquake  WHERE ( 6371 * ACOS(COS(RADIANS(latitude)) * COS(RADIANS(?)) * COS(RADIANS(longitude) - RADIANS(?)) + SIN(RADIANS(latitude)) * SIN(RADIANS(?)) ))< ?;"
-        cursor.execute(query, lat, long, lat, ran)
-        temp = cursor.fetchall()
-        temp_result = ""
-        for j in temp:
-            temp_result = temp_result + str(j)
-        red.set(4, temp_result)
-        time_query = []
-        for i in range(30):
-            time_query.append(i + 1)
-        query_time = []
-        for i in time_query:
-            start = time.time()
-            cursor.execute(query, lat, long, lat, ran)
-            end = time.time()
-            diff = end - start
-            query_time.append(diff)
-            s = time.time()
-            red.get(4)
-            e = time.time()
-            redis_time.append(e - s)
-    return render_template("page2.html", result=query_time, r=time_query, redis_time=redis_time)
 
 
 if __name__ == '__main__':

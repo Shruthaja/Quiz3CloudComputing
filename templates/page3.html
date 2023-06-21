@@ -11,9 +11,10 @@
 </head>
 <body style="background-color:teal;">
 <ul>
-    <li><a href="/" class="active">Home</a></li>
-    <li><a href="/page2.html">Page2</a></li>
-            <li><a href="/page3.html" >Page3</a></li>
+    <li><a href="/">Home</a></li>
+    <li><a href="/page2.html" >Page2</a></li>
+        <li><a href="/page3.html" class="active">Page3</a></li>
+
 
 
 </ul>
@@ -21,17 +22,18 @@
     <h1>Shruthaja P Rao</h1>
     <h2>1002118604</h2>
 </div>
-<div style="margin-top:8%;">
-    <form action="/" method="post">
+<div style="margin-top:3%;">
+   <form action="/page3.html" method="post">
 <label>Enter City population Range</label>
-        <input type="text" name="srange">
-        <input type="text" name="erange">
+        <input type="text" name="srange" placeholder="min Population">
+        <input type="text" name="erange" placeholder="max Population">
+       <input type="text" name="cname" placeholder="Enter state Name">
+       <input type="text" name="pop" placeholder="Enter Inc for Population">
         <input type="submit">
     </form>
 
     <div style="margin-top:3%;">
-        <h2>Db total time : {{tot_db}}</h2>
-        <h2>Redis total time : {{tot_red}}</h2>
+
         <table id="example" class="display" style="font-size:9px">
             <thead>
             <th>city</th>
@@ -42,7 +44,28 @@
             <th>lon</th>
             </thead>
             <tbody>
-            {% for i in query %}
+            {% for i in cities %}
+            <tr>
+                {% for j in i %}
+                <td>
+                    <div class=scrollable>{{j}}</div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+         <table id="example2" class="display" style="font-size:9px">
+            <thead>
+            <th>city</th>
+
+            <th>State</th>
+            <th>Population</th>
+            <th>lat</th>
+            <th>lon</th>
+            </thead>
+            <tbody>
+            {% for i in cities2 %}
             <tr>
                 {% for j in i %}
                 <td>
@@ -54,37 +77,18 @@
             </tbody>
         </table>
     </div>
-    <div style="margin-top:3%;" id='myDiv'>
+
+
 
     </div>
 
-</div>
-
-<script>
-$('#example').DataTable();
-
-var data = [{
-  x: {{r}},
-  y: {{result}},  mode: 'lines+markers',
-
-  name:'Db',
-  type: 'scatter'
-},{
- x: {{r}},
-  y: {{redis_time}},  mode: 'lines+markers',
-
-  name: 'Redis',
-  type: 'scatter'
-}];
-console.log(data);
-var layout = {
-  title: '1000 Random Tuples vs Time Taken To Fetch'
-};
-Plotly.newPlot('myDiv',data,layout);
+    <script>
+    $('#example').DataTable();
+    $('#example2').DataTable();
 
 
 
+    </script>
 
-</script>
 </body>
 </html>

@@ -13,6 +13,8 @@
 <ul>
     <li><a href="/">Home</a></li>
     <li><a href="/page2.html" class="active">Page2</a></li>
+            <li><a href="/page3.html" >Page3</a></li>
+
 
 
 </ul>
@@ -21,35 +23,59 @@
     <h2>1002118604</h2>
 </div>
 <div style="margin-top:3%;">
-    <form action="/page2.html" method="post">
-        <label>Create Box</label><br>
-        <input name="lat" type="text" placeholder="Enter min lat">
-        <input name="lon" type="text" placeholder="Enter min lon">
-
-        <input name="mlat" type="text" placeholder="Enter max lat">
-
-        <input name="mlon" type="text" placeholder="Enter max lon">
-
-        <input style="margin-top:2%" type="submit" placeholder="Click me!">
+   <form action="/page2.html" method="post">
+<label>Enter City population Range</label>
+        <input type="text" name="srange" placeholder="min Population">
+        <input type="text" name="erange" placeholder="max Population">
+       <input type="text" name="number" placeholder="no of Tuples">
+        <input type="submit">
     </form>
-    <form action="/page22.html" method="post">
-        <input name="smag" type="text" placeholder="Enter starting mag">
-        <input name="emag" type="text" placeholder="Enter ending mag">
-        <input style="margin-top:2%" type="submit" placeholder="Click me!">
-    </form>
+<!--    <form action="/page22.html" method="post">-->
+<!--        <input name="smag" type="text" placeholder="Enter starting mag">-->
+<!--        <input name="emag" type="text" placeholder="Enter ending mag">-->
+<!--        <input style="margin-top:2%" type="submit" placeholder="Click me!">-->
+<!--    </form>-->
 
-    <form action="/page23.html" method="post">
-        <input name="lat1" type="text" placeholder="Enter min lat">
-        <input name="lon1" type="text" placeholder="Enter min lon">
-        <input name="range" type="text" placeholder="Enter Range">
-        <input style="margin-top:2%" type="submit" placeholder="Click me!">
-    </form>
+<!--    <form action="/page23.html" method="post">-->
+<!--        <input name="lat1" type="text" placeholder="Enter min lat">-->
+<!--        <input name="lon1" type="text" placeholder="Enter min lon">-->
+<!--        <input name="range" type="text" placeholder="Enter Range">-->
+<!--        <input style="margin-top:2%" type="submit" placeholder="Click me!">-->
+<!--    </form>-->
+    <div style="margin-top:3%;">
+        <h2>Db total time : {{tot_db}}</h2>
+        <h2>Redis total time : {{tot_red}}</h2>
+
+        <table id="example" class="display" style="font-size:9px">
+            <thead>
+            <th>city</th>
+
+            <th>State</th>
+            <th>Population</th>
+            <th>lat</th>
+            <th>lon</th>
+            </thead>
+            <tbody>
+            {% for i in query %}
+            <tr>
+                {% for j in i %}
+                <td>
+                    <div class=scrollable>{{j}}</div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <div style="margin-top:3%;" id="myDiv">
 
     </div>
 
     <script>
+    $('#example').DataTable();
+
 var data = [{
   x: {{r}},
   y: {{result}},  mode: 'lines+markers',
