@@ -12,9 +12,8 @@
 <body style="background-color:teal;">
 <ul>
     <li><a href="/">Home</a></li>
-    <li><a href="/page2.html" >Page2</a></li>
-        <li><a href="/page3.html" class="active">Page3</a></li>
-
+    <li><a href="/page2.html">Page2</a></li>
+    <li><a href="/page3.html" class="active">Page3</a></li>
 
 
 </ul>
@@ -23,17 +22,17 @@
     <h2>1002118604</h2>
 </div>
 <div style="margin-top:3%;">
-   <form action="/page3.html" method="post">
-<label>Enter City population Range</label>
+    <form action="/page3.html" method="post">
+        <label>Enter City population Range</label>
         <input type="text" name="srange" placeholder="min Population">
         <input type="text" name="erange" placeholder="max Population">
-       <input type="text" name="cname" placeholder="Enter state Name">
-       <input type="text" name="pop" placeholder="Enter Inc for Population">
+        <input type="text" name="cname" placeholder="Enter state Name">
+        <input type="text" name="pop" placeholder="Enter Inc for Population">
         <input type="submit">
     </form>
 
     <div style="margin-top:3%;">
-<h2> Total time for the operations : {{tot}}</h2>
+        <h2> Total time for the operations : {{tot}}</h2>
         <table id="example" class="display" style="font-size:9px">
             <thead>
             <th>city</th>
@@ -55,7 +54,7 @@
             {% endfor %}
             </tbody>
         </table>
-         <table id="example2" class="display" style="font-size:9px">
+        <table id="example2" class="display" style="font-size:9px">
             <thead>
             <th>city</th>
 
@@ -79,16 +78,16 @@
     </div>
 
 
+</div>
 
-    </div>
-
-    <script>
+<script>
     $('#example').DataTable();
     $('#example2').DataTable();
 
 
 
-    </script>
+
+</script>
 
 </body>
 </html>

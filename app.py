@@ -1,4 +1,5 @@
 import time
+
 import pyodbc
 import redis
 from flask import Flask
@@ -27,18 +28,18 @@ def hello_world():
     r = ''
     redis_time = []
     time_query = []
-    query=""
-    temp=[]
+    query = ""
+    temp = []
     tot_db = 0
     tot_red = 0
-    if request.method=="POST":
-        srange=request.form['srange']
-        erange=request.form['erange']
+    if request.method == "POST":
+        srange = request.form['srange']
+        erange = request.form['erange']
         for i in range(30):
             time_query.append(i + 1)
         query_time = []
         query = "SELECT * FROM [dbo].[city1] where Population between ? and ?"
-        cursor.execute(query,srange,erange)
+        cursor.execute(query, srange, erange)
         temp = cursor.fetchall()
         temp_result = ""
         for j in temp:
@@ -51,13 +52,14 @@ def hello_world():
             end = time.time()
             diff = end - start
             query_time.append(diff)
-            tot_db=tot_db+diff
+            tot_db = tot_db + diff
             s = time.time()
             red.get(1)
             e = time.time()
             redis_time.append(e - s)
-            tot_red=tot_red+(e-s)
-    return render_template("index.html", result=query_time, r=time_query, redis_time=redis_time,query=temp,tot_db=tot_db,tot_red=tot_red)
+            tot_red = tot_red + (e - s)
+    return render_template("index.html", result=query_time, r=time_query, redis_time=redis_time, query=temp,
+                           tot_db=tot_db, tot_red=tot_red)
 
 
 @app.route('/page2.html', methods=['GET', 'POST'])
@@ -68,40 +70,41 @@ def page2():
     redis_time = []
     time_query = []
     query = ""
-    tot_db=0
-    tot_red=0
-    temp=[]
+    tot_db = 0
+    tot_red = 0
+    temp = []
     if request.method == "POST":
         srange = request.form['srange']
         erange = request.form['erange']
-        no=int(request.form['number'])
+        no = int(request.form['number'])
         for i in range(30):
             time_query.append(i + 1)
         query_time = []
-        query = "SELECT TOP (?) * FROM [dbo].[city1] TABLESAMPLE(500 rows) where Population between ? and ?"
-        cursor.execute(query,no,srange, erange)
+        query = "SELECT TOP (?) * FROM [dbo].[city1] TABLESAMPLE(100 rows) where Population between ? and ?"
+        cursor.execute(query, no, srange, erange)
         temp = cursor.fetchall()
         temp_result = ""
         for j in temp:
             temp_result = temp_result + str(j)
         red.set(1, temp_result)
-        tot_db=0
-        tot_red=0
+        tot_db = 0
+        tot_red = 0
         for i in time_query:
             start = time.time()
             cursor.execute(query, no, srange, erange)
             end = time.time()
-            temp=cursor.fetchall()
+            temp = cursor.fetchall()
             diff = end - start
             query_time.append(diff)
-            tot_db=tot_db+diff
+            tot_db = tot_db + diff
             s = time.time()
             red.get(1)
             e = time.time()
             redis_time.append(e - s)
-            tot_red=tot_red+(e-s)
+            tot_red = tot_red + (e - s)
         print(temp)
-    return render_template("page2.html", result=query_time, r=time_query, redis_time=redis_time, query=temp,tot_db=tot_db,tot_red=tot_red)
+    return render_template("page2.html", result=query_time, r=time_query, redis_time=redis_time, query=temp,
+                           tot_db=tot_db, tot_red=tot_red)
 
 
 @app.route('/page3.html', methods=['GET', 'POST'])
@@ -110,28 +113,27 @@ def page3():
     time_query = []
     result = []
     redis_time = []
-    tot=0
-    cities=''
-    cities2=''
+    tot = 0
+    cities = ''
+    cities2 = ''
     if request.method == "POST":
-        min=request.form['srange']
-        max=request.form['erange']
-        cname=request.form['cname']
-        inc=request.form['pop']
-        s=time.time()
-        query="select * from dbo.city1 where population>? and population<? and state=?"
-        cursor.execute(query,min,max,cname)
-        cities=cursor.fetchall()
+        min = request.form['srange']
+        max = request.form['erange']
+        cname = request.form['cname']
+        inc = request.form['pop']
+        s = time.time()
+        query = "select * from dbo.city1 where population>? and population<? and state=?"
+        cursor.execute(query, min, max, cname)
+        cities = cursor.fetchall()
         query = "update city1 set population=population+? where City in (select City from dbo.city1 where population>? and population<? and state=?)"
         cursor.execute(query, inc, min, max, cname)
         cursor.commit()
         query = "select * from dbo.city1 where state=?"
         cursor.execute(query, cname)
         cities2 = cursor.fetchall()
-        e=time.time()
-        tot=e-s
-    return render_template("page3.html", tot=tot,cities=cities,cities2=cities2)
-
+        e = time.time()
+        tot = e - s
+    return render_template("page3.html", tot=tot, cities=cities, cities2=cities2)
 
 
 if __name__ == '__main__':
